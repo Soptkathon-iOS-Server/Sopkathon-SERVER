@@ -1,4 +1,5 @@
 const pool = require('../modules/pool');
+let moment = require('moment');
 const table = 'movie';
 
 const movie = {
@@ -36,10 +37,20 @@ const movie = {
             const result = await pool.queryParam(query);
             return result;
         }catch(err){
-            console.log('searchPost ERROR: ', err);
+            console.log('getMovieByIdx ERROR : ', err);
             throw err;
-        }
+    }
+    },
+    getMovieIdxByName: async(name)=>{
+        const query = `SELECT * FROM ${table} WHERE name="${name}";`
+        try{
+            const result = await pool.queryParam(query);
+            const resultIdx = result[0].idx;
+            return resultIdx;
+        }catch(err){
+            console.log('getMovieIdxByName ERROR : ', err);
+            throw err;
     }
 }
-
-module.exports = movie;
+}
+module.exports = post;
