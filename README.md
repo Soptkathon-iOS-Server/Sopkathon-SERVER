@@ -23,6 +23,11 @@
 
 <br>
 
+## EC2
+<img width="957" alt="KakaoTalk_20200607_083623016" src="https://user-images.githubusercontent.com/55133871/83956529-0fb26180-a89a-11ea-844c-3906c6ec9ec4.png">
+
+<br>
+
 ## 💻ABOUT SERVER💻
 참여 개발자 : 임형준, 장세영
 
