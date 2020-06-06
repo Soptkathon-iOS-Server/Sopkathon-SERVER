@@ -10,7 +10,7 @@ exports.readAllMovie = async (req, res) => {
     .send(util.success(statusCode.OK, resMessage.READ_POST_SUCCESS, result));
 };
 
-exports.readMovie = async (req, res) => {
+exports.searchMovie = async (req, res) => {
     const Idx = req.params.Idx;
     
       // 존재하는 아이디인지 확인 - 없다면 No post 반환
@@ -20,8 +20,8 @@ exports.readMovie = async (req, res) => {
         return;
       }
       
-      // 성공 - read profile success와 함께 post id, title, contents 반환
-      var result = await PostModel.searchPost(postIdx);
+      // 성공 - read profile success와 함께 해당하는 정보 출력
+      var result = await MovieModel.searchMovie(Idx);
       res.status(statusCode.OK)
       .send(util.success(statusCode.OK, resMessage.READ_POST_SUCCESS, result));
       return;
