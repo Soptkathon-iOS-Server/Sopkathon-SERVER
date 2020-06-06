@@ -1,18 +1,20 @@
-const util = require('../modules/util');
-const statusCode = require('../modules/statusCode');
-const resMessage = require('../modules/responseMessage');
-const PostModel = require('../models/post');
-const jwt = require('../modules/jwt');
+const pool = require('../modules/pool');
+const table = 'post';
 
 const post = {
-    searchPost : async (req, res) => {
-        const Questionflag = req.params.Questionflag;
-          // 성공 - read profile success와 함께 post id, title, contents 반환
-          var result = await PostModel.searchPost(Questionflag);
-          res.status(statusCode.OK)
-          .send(util.success(statusCode.OK, resMessage.READ_POST_SUCCESS, result));
-          return;
-    },
+
+    //이거 뭐냐면 파라미터로 QuestionFlag(몇번째 질문에 대한 페이지인지) 받아와서
+    searchPost : async (questionFlag) => {
+        const fields = 'content1, content2, content3'; //content123 string 배열로 선언해두고
+        const query = `SELECT ${fields[questionFlag]} FROM ${table}"`; //해당 flag에 해당하는(content1은 flag가 0) string을 가져오려고 한거야!
+            try{
+                const result = await pool.queryParam(query);
+                return result;
+            }catch(err){
+                console.log('searchPost ERROR: ', err);
+                throw err;
+            }
+        },
 
     createPost : async(req, res) => {
         // 1. request body에서 값을 읽어온다.

@@ -4,28 +4,23 @@ let util = require('../modules/util');
 let Post = require('../models/post');
 let moment = require('moment');
 
-// 모든 게시글 조회
-exports.readAllPost = async (req,res)=>{
-    return res.status(statusCode.OK)
-        .send(util.success(statusCode.OK,responseMessage.READ_ALL_POST_SUCCESS, await Post.readAllPost()));
-};
-
 // 게시글 고유 id값을 조회
-exports.readPost = async (req,res)=>{
-    const id = req.params.id;
-
-    try{
-        const post = await Post.readPost(id);
-        // 해당 게시글 없음
-        if(post.length === 0)
-            return res.status(statusCode.OK).send(util.fail(statusCode.OK,responseMessage.READ_FAIL));
-
-        // 성공
-        return res.status(statusCode.OK).send(util.success(statusCode.OK,responseMessage.READ_POST_SUCCESS, post[0]));
-    } catch(err){
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
-        throw err;
+exports.searchPost = async (req,res)=>{
+    const questionFlag = req.params.questionFlag;
+    const post = await Post.searchPost(questionFlag);
+    
+    /*
+    글 없을 일 없으니까 필요 없을듯
+    // 해당 게시글 없음
+    if(post.length === 0){
+        return res.status(statusCode.OK)
+        .send(util.fail(statusCode.OK,responseMessage.READ_FAIL));
     }
+    */
+
+    // 성공
+    return res.status(statusCode.OK)
+    .send(util.success(statusCode.OK,responseMessage.READ_POST_SUCCESS, post));
 };
 
 
