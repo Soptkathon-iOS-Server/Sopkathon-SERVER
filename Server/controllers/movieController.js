@@ -13,7 +13,7 @@ exports.readAllMovie = async (req, res) => {
 exports.searchMovie = async (req, res) => {
     const Idx = req.params.Idx;
     
-      // 존재하는 아이디인지 확인 - 없다면 No post 반환
+      // 존재하는 인덱스인지 확인 - 없다면 No post 반환
       if(await PostModel.checkMovieIdx(Idx) == false){
         res.status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_POST));
