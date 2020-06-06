@@ -4,8 +4,8 @@ const config = {
     host : '',
     port : 3306,
     user : 'admin',
-    password : '',
-    database : 'test'
+    password : '!',
+    database : 'hackertone'
 }
 
 module.exports = mysql.createPool(config)

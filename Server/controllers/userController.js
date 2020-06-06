@@ -6,10 +6,10 @@ const crypto = require('crypto');
 const jwt = require('../modules/jwt');
 
 exports.signup = async (req, res) => {
-    const {id, name, password, email} = req.body;
+    const {id, name, password} = req.body;
     try {
         // null 값 확인
-        if (!id || !name || !password || !email)
+        if (!id || !name || !password )
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
         // already ID
@@ -20,12 +20,12 @@ exports.signup = async (req, res) => {
         const salt = crypto.randomBytes(32).toString();
         const hashedPassword = crypto.pbkdf2Sync(password, salt, 1, 32, 'sha512').toString('hex');
 
-        const idx = await User.signup(id, name, hashedPassword, salt, email);
-        if (idx === -1)
+        const result = await User.signup(id, name, hashedPassword, salt);
+        if (result === false)
             return res.status(statusCode.DB_ERROR).send(util.fail(statusCode.DB_ERROR, responseMessage.DB_ERROR));
 
         //성공
-        return res.status(statusCode.CREATED).send(util.success(statusCode.CREATED, responseMessage.CREATED_USER, {userId: idx}));
+        return res.status(statusCode.CREATED).send(util.success(statusCode.CREATED, responseMessage.CREATED_USER, {result: result}));
     } catch(err){
         return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
         throw err;
@@ -45,7 +45,6 @@ exports.signin =  async(req,res)=>{
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
 
         const user = await User.signin(id, password);
-        console.log(user)
    
         // 비밀번호 확인
         if (user === false)
@@ -53,7 +52,6 @@ exports.signin =  async(req,res)=>{
 
         // jwt
         const {token, _} = await jwt.sign(user[0]);
-        const result = await jwt.sign(user[0])
         // console.log(result.token)
 
         // 성공
@@ -85,3 +83,17 @@ exports.readProfile= async(req,res)=>{
         throw err;
     }
 };
+
+exports.getAllMovie = async(req,res)=>{
+    const id = req.params.id;
+    res.status(statusCode.OK).send(util.success(statusCode.OK,responseMessage.READ_ALL_MOVIE_SUCCESS,await User.getAllMovie(id)))
+}
+
+exports.signMovie= async(req,res)=>{
+    const {
+        id,
+        movieName
+    }= req.body;
+
+    res.status(statusCode.OK).send(util.success(statusCode.OK,responseMessage.READ_ALL_MOVIE_SUCCESS,await User.signMovie(id,movieName)))
+}
