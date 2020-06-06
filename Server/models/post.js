@@ -1,5 +1,5 @@
 const pool = require('../modules/pool');
-<<<<<<< HEAD
+let moment = require('moment');
 const table = 'post';
 
 const post = {
@@ -71,10 +71,8 @@ const post = {
 }
 
 module.exports = post;
-=======
-let moment = require('moment');
-const table = 'post';
 
+/*
 const post = {
     readAllPost : async () => {
         const query = `SELECT * FROM ${table}`;
@@ -140,6 +138,4 @@ const post = {
             throw err;
         }
     }
-}
-module.exports = post;      
->>>>>>> 605670c913bbe340b1eaae72e28d4f8a42dea15c
+*/
