@@ -1,111 +1,28 @@
-let responseMessage = require('../modules/responseMessage');
-let statusCode = require('../modules/statusCode');
-let util = require('../modules/util');
-let Post = require('../models/post');
-let moment = require('moment');
+const util = require('../modules/util');
+const statusCode = require('../modules/statusCode');
+const responseMessage = require('../modules/responseMessage');
+const MovieModel = require('../models/movie');
 
-// 모든 게시글 조회
-exports.readAllPost = async (req,res)=>{
-    return res.status(statusCode.OK)
-        .send(util.success(statusCode.OK,responseMessage.READ_ALL_POST_SUCCESS, await Post.readAllPost()));
+
+exports.readAllMovie = async (req, res) => {
+    var result = await MovieModel.readAllMovie();
+    res.status(statusCode.OK)
+    .send(util.success(statusCode.OK, resMessage.READ_POST_SUCCESS, result));
 };
 
-// 게시글 고유 id값을 조회
-exports.readPost = async (req,res)=>{
-    const id = req.params.id;
-
-    try{
-        const post = await Post.readPost(id);
-        // 해당 게시글 없음
-        if(post.length === 0)
-            return res.status(statusCode.OK).send(util.fail(statusCode.OK,responseMessage.READ_FAIL));
-
-        // 성공
-        return res.status(statusCode.OK).send(util.success(statusCode.OK,responseMessage.READ_POST_SUCCESS, post[0]));
-    } catch(err){
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
-        throw err;
-    }
+exports.searchMovie = async (req, res) => {
+    const Idx = req.params.Idx;
+    
+      // 존재하는 인덱스인지 확인 - 없다면 No post 반환
+      if(await PostModel.checkMovieIdx(Idx) == false){
+        res.status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_POST));
+        return;
+      }
+      
+      // 성공 - read profile success와 함께 해당하는 정보 출력
+      var result = await MovieModel.searchMovie(Idx);
+      res.status(statusCode.OK)
+      .send(util.success(statusCode.OK, resMessage.READ_POST_SUCCESS, result));
+      return;
 };
-
-
-// 게시글 생성
-exports.createPost= async (req,res)=>{
-    const { title, content} = req.body;
-    const userIdx = req.userIdx;
-
-    try{
-        // null 값
-        if( !title || !content)
-            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST,responseMessage.NULL_VALUE));
-
-        const postIdx = await Post.writePost(userIdx, title, content);
-
-        // 성공
-        return res.status(statusCode.CREATED)
-            .send(util.success(statusCode.CREATED,responseMessage.CREATED_POST_SUCCESS, {postIdx : postIdx}));
-    } catch(err){
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
-        throw err;
-    }
-};
-
-
-// 게시글 고유 id값을 가진 게시글 수정
-exports.modifyPost = async (req,res)=>{
-    const id = req.params.id;
-    const {title, content} = req.body;
-    const userIdx = req.userIdx;
-
-    try {
-        // null 값
-        if (!id)
-            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-
-        // 내 게시글 아닌 경우
-        const post_userIdx = (await Post.getPostById(id)).userIdx;
-        if(post_userIdx !== userIdx)
-            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.MISS_MATCH_USER));
-
-        // 게시글 수정
-        await Post.updatePost(id, title, content)
-        const post = await Post.readPost(id);
-
-        // 성공
-        return res.status(statusCode.OK)
-            .send(util.success(statusCode.OK, responseMessage.MODIFY_POST_SUCCESS, post[0]));
-    } catch(err){
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
-        throw err;
-    }
-};
-
-
-
-// 게시글 고유 id값을 가진 게시글 삭제
-exports.deletePost = async (req,res)=>{
-    const id = req.params.id;
-    const userIdx = req.userIdx;
-
-    try {
-        // null 값
-        if (!id)
-            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-
-        // 내 게시글 아닌 경우
-        const post_userIdx = (await Post.getPostById(id)).userIdx;
-        if(post_userIdx !== userIdx)
-            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.MISS_MATCH_USER));
-
-        // 삭제
-        await Post.deletePost(id);
-        // 성공
-        return res.status(statusCode.OK)
-            .send(util.success(statusCode.OK, responseMessage.DELETE_POST_SUCCESS, {deletedIdx: id}));
-    } catch(err){
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
-        throw err;
-    }
-};
-
-

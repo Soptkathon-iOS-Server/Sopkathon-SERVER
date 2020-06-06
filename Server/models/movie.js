@@ -2,73 +2,37 @@ const pool = require('../modules/pool');
 let moment = require('moment');
 const table = 'movie';
 
-const post = {
-    readAllPost : async () => {
+const movie = {
+    readAllMovie : async () => {
         const query = `SELECT * FROM ${table}`;
         try{
             const result = await pool.queryParam(query);
             return result;
-        } catch(err){
-            console.log('readAllPost ERROR : ', err);
+        }catch (err){
+            console.log('readAllMovie ERROR : ', err);
             throw err;
         }
     },
-    readPost : async (id) => {
-        const query = `SELECT * FROM ${table} WHERE postIdx = ${id}`;
-        try{
-            const result = await pool.queryParam(query);
-            return result;
-        } catch(err){
-            console.log('readPost ERROR : ', err);
-            throw err;
-        }
-    },
-    writePost : async ( userIdx, title, content) => {
-        const createdAt = moment().format("YYYY년 MM월 DD일");
-        const fields = 'userIdx, title, content, createdAt';
-        const questions = `?, ?, ?, "${createdAt}"`;
-        const values = [userIdx, title, content];
-        const query = `INSERT INTO ${table}(${fields}) VALUES(${questions})`;
 
-        try {
-            const result = await pool.queryParamArr(query, values);
-            const insertId = result.insertId;
-            return insertId;
-        } catch(err){
-            console.log('writePost ERROR : ', err);
-            throw err;
-        }
-    },
-    updatePost : async (id, title, content) => {
-        const query = `UPDATE ${table} SET title = "${title}", content = "${content}" WHERE postIdx="${id}"`;
-        try{
-            await pool.queryParam(query);
-        } catch(err){
-            console.log('updatePost ERROR : ', err);
-            throw err;
-        }
-    },
-    deletePost : async (id) => {
-        const query = `DELETE FROM ${table} where postIdx="${id}"`;
-        try{
-            await pool.queryParam(query);
-        } catch(err){
-            console.log('deletePost ERROR : ', err);
-            throw err;
-        }
-    },
-    getPostById : async (id) => {
-        const query = `SELECT * FROM ${table} WHERE postIdx = "${id}";`
+    //해당 idx의 movie가 존재하는지 확인
+    checkMovieIdx: async (Idx) => {
+        const query = `SELECT * FROM ${table} WHERE movieIdx = "${Idx}"`;    //해당 아이디에 해당하는 모든 데이터
         try{
             const result = await pool.queryParam(query);
-            return result[0];
+            if( result.length === 0 ){  //id에 해당하는 정보가 없다면
+                return false;   //false 반환 -> routes/post.js에서 이 결과값으로 아이디 체크
+            } else{
+                return true;
+            } //if문에 걸리지 않았다면 정보가 있다는 의미
         } catch(err){
-            console.log('getPostById ERROR : ', err);
+            console.log('checkPostID ERROR: ', err);
             throw err;
         }
     },
-    getMovieByIdx: async(idx)=>{
-        const query = `SELECT * FROM ${table} WHERE idx="${idx}";`
+
+    //해당 id 게시글 조회
+    searchMovie : async (Idx) => {
+    const query = `SELECT * FROM ${table} WHERE postIdx = "${Idx}"`;
         try{
             const result = await pool.queryParam(query);
             return result;
@@ -89,4 +53,4 @@ const post = {
     }
 }
 }
-module.exports = post;      
+module.exports = post;
