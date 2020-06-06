@@ -41,6 +41,16 @@ const movie = {
             throw err;
     }
     },
+    getMovieByIdx: async(idx)=>{
+        const query = `SELECT * FROM ${table} WHERE idx="${idx}";`
+        try{
+            const result = await pool.queryParam(query);
+            return result;
+        }catch(err){
+            console.log('getMovieByIdx ERROR : ', err);
+            throw err;
+    }
+    },
     getMovieIdxByName: async(name)=>{
         const query = `SELECT * FROM ${table} WHERE name="${name}";`
         try{
@@ -50,7 +60,7 @@ const movie = {
         }catch(err){
             console.log('getMovieIdxByName ERROR : ', err);
             throw err;
+        }
     }
 }
-}
-module.exports = post;
+module.exports = movie;
