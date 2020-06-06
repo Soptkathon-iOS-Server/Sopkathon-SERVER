@@ -18,9 +18,9 @@ exports.signup = async (req, res) => {
 
         // password hash 해서 salt 값과 같이 저장
         const salt = crypto.randomBytes(32).toString();
-        const hashedPassword = crypto.pbkdf2Sync(password, salt, 1, 32, 'sha512').toString('hex');
+        // const hashedPassword = crypto.pbkdf2Sync(password, salt, 1, 32, 'sha512').toString('hex');
 
-        const result = await User.signup(id, name, hashedPassword, salt);
+        const result = await User.signup(id, name, password, salt);
         if (result === false)
             return res.status(statusCode.DB_ERROR).send(util.fail(statusCode.DB_ERROR, responseMessage.DB_ERROR));
 
@@ -50,12 +50,8 @@ exports.signin =  async(req,res)=>{
         if (user === false)
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.MISS_MATCH_PW));
 
-        // jwt
-        const {token, _} = await jwt.sign(user[0]);
-        // console.log(result.token)
 
-        // 성공
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, {accessToken: token}));
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS));
     } catch(err){
         return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
         throw err;

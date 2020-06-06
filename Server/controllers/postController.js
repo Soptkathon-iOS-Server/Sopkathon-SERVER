@@ -3,6 +3,7 @@ let statusCode = require('../modules/statusCode');
 let util = require('../modules/util');
 let Post = require('../models/post');
 let moment = require('moment');
+let Movie = require('../models/movie')
 
 // 게시글 고유 id값을 조회
 exports.searchPost = async (req,res)=>{
@@ -26,24 +27,31 @@ exports.searchPost = async (req,res)=>{
 
 // 게시글 생성
 exports.createPost= async (req,res)=>{
-    const { title, content} = req.body;
-    const userIdx = req.userIdx;
+    const { 
+        id,
+        movieName,
+        likes,
+        content1,
+        content2,
+        content3,
+    } = req.body;
 
-    try{
-        // null 값
-        if( !title || !content)
-            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST,responseMessage.NULL_VALUE));
+    const movieIdx = await Movie.getMovieIdxByName(movieName)
 
-        const postIdx = await Post.writePost(userIdx, title, content);
+    const insertIdx = await Post.createPost(id,movieIdx,content1,content2,content3,likes);
 
-        // 성공
-        return res.status(statusCode.CREATED)
-            .send(util.success(statusCode.CREATED,responseMessage.CREATED_POST_SUCCESS, {postIdx : postIdx}));
-    } catch(err){
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, err.message));
-        throw err;
-    }
+    return res.status(statusCode.OK)
+    .send(util.success(statusCode.OK,responseMessage.CREATE_POST_SUCCESS, {insertIdx:insertIdx}));
+
 };
+
+exports.getAllPost = async(req,res)=>{
+
+    const result = await Post.getAllPost()
+
+    return res.status(statusCode.OK)
+    .send(util.success(statusCode.OK,responseMessage.CREATE_POST_SUCCESS, {result:result}));
+}
 
 
 // 게시글 고유 id값을 가진 게시글 수정

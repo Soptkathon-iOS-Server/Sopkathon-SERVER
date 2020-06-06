@@ -1,6 +1,7 @@
 const pool = require('../modules/pool');
 let moment = require('moment');
 const table = 'post';
+const tableUserMovie = 'user_watched_movie';
 
 const post = {
 
@@ -17,15 +18,19 @@ const post = {
             }
         },
 
-    createPost : async(req, res) => {
-        // 1. request body에서 값을 읽어온다.
-        const {content1, content2, content3} = req.body;
-    
-        // 2. 새로운 POST를 등록한다. post의 id는 자동으로 +1
-        var result = await PostModel.createPost(content1, content2, content3);
-      
-        // 3. POST 작성 성공
-        res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.CREATED_POST, result));
+    createPost : async(id,movieIdx,content1,content2,content3,likes) => {
+       const fields = 'content1,content2,content3,user_watched_movie_user_id,user_watched_movie_movie_idx,likes'
+       const questions = '?,?,?,?,?,?'
+       const values = [content1,content2,content3,id,movieIdx,likes];
+       const query = `INSERT INTO ${table}(${fields}) VALUES (${questions})`
+       try{
+        const result = await pool.queryParamArr(query,values);
+        const insertIdx = result.insertIdx;
+        return insertIdx;
+       }catch(err){
+                console.log('createPost ERROR: ', err);
+                throw err;
+            }
     },
 
     editPost : async(req, res) => {
@@ -66,8 +71,18 @@ const post = {
           postID : postIdx
         }));
         return;
-    }
+    },
 
+    getAllPost: async(req,res)=>{
+        const query = `SELECT * FROM ${table}`
+        try{
+            const result = await pool.queryParam(query)
+            return result;
+        }catch(err){
+                console.log('getAllPost ERROR: ', err);
+                throw err;
+            }
+    }
 }
 
 module.exports = post;

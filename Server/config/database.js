@@ -4,7 +4,7 @@ const config = {
     host : '',
     port : 3306,
     user : 'admin',
-    password : '!',
+    password : '',
     database : 'hackertone'
 }
 

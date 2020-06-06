@@ -32,7 +32,7 @@ const movie = {
 
     //해당 id 게시글 조회
     searchMovie : async (Idx) => {
-    const query = `SELECT * FROM ${table} WHERE postIdx = "${Idx}"`;
+    const query = `SELECT * FROM ${table} WHERE idx = "${Idx}"`;
         try{
             const result = await pool.queryParam(query);
             return result;

@@ -39,10 +39,11 @@ const user = {
         const query = `SELECT * FROM ${table} WHERE id = "${id}";`
         try{
             const result = await pool.queryParam(query);
-            const hashedPassword = await crypto.pbkdf2Sync(password, result[0].salt, 1, 32, 'sha512').toString('hex');
+            // const hashedPassword = await crypto.pbkdf2Sync(password, result[0].salt, 1, 32, 'sha512').toString('hex');
 
-            if(result[0].password === hashedPassword) return result;
-            else return false;
+            // if(result[0].password === hashedPassword) return result;
+            // else return false;
+            return result;
         } catch(err){
             console.log('signin ERROR : ', err);
             throw err;
